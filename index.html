@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SEL Safety Corner</title>
+    <!-- Font Awesome 6 圖示庫 (全面使用 Font Awesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- 網站主樣式表 -->
+    <link rel="stylesheet" href="style.css?v=20261108_6">
+</head>
+<body>
+
+    <!-- 3D 情緒安全角畫布容器 -->
+    <div id="canvas-container" aria-label="3D 情緒安全角互動場景"></div>
+
+    <!-- 3D 物件懸停提示 -->
+    <div id="object-tooltip">
+        <i class="fa-solid fa-hand-pointer"></i>
+        <span id="tooltip-text">點擊互動</span>
+    </div>
+
+    <!-- 頂部浮動通知 -->
+    <div id="floating-toast" class="floating-toast">
+        <i class="fa-solid fa-star"></i>
+        <span id="toast-message">歡迎來到溫馨星光木質調 3D 情緒安全角</span>
+    </div>
+
+    <!-- 投入原木樹洞的文字飛行動畫卡 (先清晰顯示使用者的話，再化為微光消散) -->
+    <div id="flying-worry-card" aria-live="polite">
+        <div class="flying-card-tag">
+            <i class="fa-solid fa-tree"></i>
+            <span>原木樹洞已經聽見你的心聲：</span>
+        </div>
+        <div class="flying-card-content" id="flying-card-text"></div>
+        <div class="flying-card-status">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>正在將這段話溫柔包覆，化作森林星塵飄散...</span>
+        </div>
+    </div>
+
+    <!-- 頂部導覽與網頁標題 -->
+    <header class="top-header">
+        <div class="brand-box">
+            <div class="brand-icon">
+                <i class="fa-solid fa-seedling"></i>
+            </div>
+            <div class="brand-title-group">
+                <h1>SEL Safety Corner</h1>
+                <div class="brand-subtitle">
+                    <i class="fa-solid fa-star"></i>
+                    <span>溫馨星光木質調 3D 互動式社會情緒學習安全角</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 頂部環境氛圍與白噪音控制列 (新增「溫馨星光」版本按鈕) -->
+        <div class="header-controls">
+            <div class="scene-pill-group" role="group" aria-label="環境光線切換">
+                <button class="icon-btn active" data-ambiance="woodwarm" title="溫暖木屋星光">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <span>木屋暖光</span>
+                </button>
+                <button class="icon-btn" data-ambiance="starlight" title="溫馨繽紛星光點點">
+                    <i class="fa-solid fa-star"></i>
+                    <span>溫馨星光</span>
+                </button>
+                <button class="icon-btn" data-ambiance="sunny" title="森林柔和晨光">
+                    <i class="fa-solid fa-sun"></i>
+                    <span>森林晨光</span>
+                </button>
+                <button class="icon-btn" data-ambiance="sunset" title="粉彩靜謐夕陽">
+                    <i class="fa-solid fa-cloud-sun"></i>
+                    <span>粉彩夕陽</span>
+                </button>
+                <button class="icon-btn" data-ambiance="rainy" title="星夜聽雨時光">
+                    <i class="fa-solid fa-cloud-rain"></i>
+                    <span>聽雨時光</span>
+                </button>
+            </div>
+
+            <div class="scene-pill-group" role="group" aria-label="自然白噪音與視角">
+                <button class="icon-btn" id="btn-toggle-bgm" title="切換森林自然白噪音">
+                    <i class="fa-solid fa-volume-off" id="bgm-icon"></i>
+                    <span id="bgm-label">自然音：關閉</span>
+                </button>
+                <button class="icon-btn" id="btn-reset-camera" title="重置 3D 視角">
+                    <i class="fa-solid fa-camera-rotate"></i>
+                    <span>全景視角</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 右側互動功能面板 -->
+    <aside class="side-panel" id="side-panel">
+        <div class="panel-header">
+            <div class="panel-title">
+                <i class="fa-solid fa-star" id="panel-icon"></i>
+                <span id="panel-title-text">木質安全角導覽與互動</span>
+            </div>
+            <button class="panel-toggle-btn" id="btn-minimize-panel" title="展開或收合面板">
+                <i class="fa-solid fa-chevron-down" id="minimize-icon"></i>
+            </button>
+        </div>
+
+        <div class="panel-body">
+            <!-- 1. 全景總覽模式 -->
+            <div class="tab-section active" id="tab-overview">
+                <div class="info-card">
+                    <i class="fa-solid fa-circle-info"></i>
+                    歡迎來到 <strong>SEL Safety Corner</strong>！木屋周圍環繞著溫馨繽紛的<strong>璀璨星光點點</strong>，房內寬敞擺放著<strong>溫暖抱抱熊</strong>、<strong>獨立抱枕軟墊區</strong>、<strong>純幾何感官捏捏桌</strong>、<strong>原木七音木琴</strong>、<strong>彩色星砂流沙漏</strong>與<strong>視訊安全鏡</strong>。
+                </div>
+                <div class="quote-box" id="daily-affirmation">
+                    <i class="fa-solid fa-quote-left"></i>
+                    「滿天溫柔的星光正守護著你，在這裡你可以靠著柔軟抱枕安心停下來，照顧自己的每一個感受。」
+                </div>
+                <div class="action-grid">
+                    <button class="action-btn" data-goto="bear">
+                        <i class="fa-solid fa-couch"></i>
+                        <span>熊熊與抱枕軟墊</span>
+                    </button>
+                    <button class="action-btn" data-goto="squishy">
+                        <i class="fa-solid fa-shapes"></i>
+                        <span>幾何感官捏捏</span>
+                    </button>
+                    <button class="action-btn" data-goto="sensory">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                        <span>七音木琴與星砂漏</span>
+                    </button>
+                    <button class="action-btn" data-goto="breath">
+                        <i class="fa-solid fa-video"></i>
+                        <span>呼吸與安全鏡</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. 溫暖抱抱熊 & 療癒抱枕軟墊群 -->
+            <div class="tab-section" id="tab-bear">
+                <div class="info-card">
+                    <i class="fa-solid fa-couch"></i>
+                    <strong>溫暖抱抱熊 & 抱枕軟墊角</strong>：地墊與窗邊木臥榻上整齊擺放著<strong>鼠尾草綠絨球抱枕</strong>、<strong>焦糖泡芙圓坐墊</strong>、<strong>雲朵大靠枕</strong>與<strong>愛心擁抱枕</strong>。點擊 3D 熊熊或任一抱枕感受蓬鬆包覆感！
+                </div>
+                <div class="quote-box" id="bear-speech">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    「嗨！今天辛苦了，來靠著蓬鬆的抱枕軟墊，讓我給你一個大大的溫暖擁抱吧！」
+                </div>
+                <div class="stat-row">
+                    <span><i class="fa-solid fa-heart-pulse"></i> 安全感陪伴指數</span>
+                    <span class="stat-value" id="bear-love-count">100%</span>
+                </div>
+                <div class="action-grid">
+                    <button class="action-btn primary-action" id="btn-bear-hug">
+                        <i class="fa-solid fa-hands-holding-child"></i>
+                        <span>給熊熊一個溫暖擁抱</span>
+                    </button>
+                    <button class="action-btn" id="btn-fluff-pillows">
+                        <i class="fa-solid fa-couch"></i>
+                        <span>拍拍蓬鬆抱枕軟墊</span>
+                    </button>
+                    <button class="action-btn" id="btn-bear-pat">
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+                        <span>輕輕摸摸熊熊</span>
+                    </button>
+                    <button class="action-btn" id="btn-bear-talk" style="grid-column: span 2;">
+                        <i class="fa-solid fa-seedling"></i>
+                        <span>抽取安心鼓勵卡</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. 純幾何形狀感官舒壓捏捏 -->
+            <div class="tab-section" id="tab-squishy">
+                <div class="info-card">
+                    <i class="fa-solid fa-shapes"></i>
+                    <strong>純幾何感官捏捏教具</strong>：獨立小木桌的櫸木托盤上擺放著<strong>柔光圓球</strong>、<strong>溫潤方塊</strong>、<strong>感官圓環</strong>與<strong>圓潤多面體</strong>。純粹的幾何形狀能安全引導幼兒透過觸覺按壓釋放身體張力。
+                </div>
+                <div class="stat-row">
+                    <span><i class="fa-solid fa-hand-dots"></i> 感官按壓次數</span>
+                    <span class="stat-value" id="squish-count">0 次</span>
+                </div>
+                <div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:6px; color:var(--text-muted);">
+                        <span><i class="fa-solid fa-leaf"></i> 身體緊繃舒緩度</span>
+                        <span id="stress-relief-pct">0%</span>
+                    </div>
+                    <div class="meter-bar-bg">
+                        <div class="meter-bar-fill" id="stress-meter-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="action-grid">
+                    <button class="action-btn primary-action" id="btn-squish-all">
+                        <i class="fa-solid fa-compress"></i>
+                        <span>全部幾何形狀一起按壓舒緩</span>
+                    </button>
+                    <button class="action-btn" id="btn-squish-sphere">
+                        <i class="fa-solid fa-circle"></i>
+                        <span>按壓柔光圓球</span>
+                    </button>
+                    <button class="action-btn" id="btn-squish-cube">
+                        <i class="fa-solid fa-square"></i>
+                        <span>按壓溫潤方塊</span>
+                    </button>
+                    <button class="action-btn" id="btn-squish-torus">
+                        <i class="fa-solid fa-ring"></i>
+                        <span>按壓感官圓環</span>
+                    </button>
+                    <button class="action-btn" id="btn-squish-poly">
+                        <i class="fa-solid fa-diamond"></i>
+                        <span>按壓圓潤多面體</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4. 原木七音木琴與細緻靜心星砂漏 -->
+            <div class="tab-section" id="tab-sensory">
+                <div class="info-card">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                    <strong>木質星砂流沙漏 & 原木七音木琴</strong>：翻轉沙漏看著彩色星砂顆粒流下堆積，可在下方點選變換<strong>星砂顏色</strong>；或敲擊七音階（Do～Si）原木琴鍵。
+                </div>
+                <div class="stat-row">
+                    <span><i class="fa-solid fa-hourglass-start"></i> 靜心星砂進度</span>
+                    <span class="stat-value" id="hourglass-timer-text">星砂流動中...</span>
+                </div>
+                <!-- 沙漏與天氣瓶共用的星砂色彩快速切換列 -->
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                    <span style="font-size:0.8rem; color:var(--text-muted);"><i class="fa-solid fa-palette"></i> 點選變換星砂顏色：</span>
+                    <div class="sand-color-dots" role="group" aria-label="切換星砂顏色">
+                        <button class="sand-dot active" data-sand-color="#fbbf24" data-sand-name="暖陽金黃" style="background:#fbbf24;" title="暖陽金黃"></button>
+                        <button class="sand-dot" data-sand-color="#38bdf8" data-sand-name="晴空湛藍" style="background:#38bdf8;" title="晴空湛藍"></button>
+                        <button class="sand-dot" data-sand-color="#f43f5e" data-sand-name="珊瑚熾紅" style="background:#f43f5e;" title="珊瑚熾紅"></button>
+                        <button class="sand-dot" data-sand-color="#a855f7" data-sand-name="薰衣草紫" style="background:#a855f7;" title="薰衣草紫"></button>
+                        <button class="sand-dot" data-sand-color="#10b981" data-sand-name="森林翠綠" style="background:#10b981;" title="森林翠綠"></button>
+                        <button class="sand-dot" data-sand-color="#ec4899" data-sand-name="櫻花粉紅" style="background:#ec4899;" title="櫻花粉紅"></button>
+                    </div>
+                </div>
+                <div class="action-grid">
+                    <button class="action-btn primary-action" id="btn-flip-hourglass">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>翻轉 3D 木質星砂流沙漏 (重新倒數 30 秒)</span>
+                    </button>
+                </div>
+                <div style="font-size:0.82rem; color:var(--text-muted); margin-top:2px;">
+                    <i class="fa-solid fa-music"></i> 點擊下方或 3D 地墊上的<strong>原木七音木琴</strong>（鍵盤數字 1～7）：
+                </div>
+                <div class="xylophone-row">
+                    <button class="xylo-key" data-note="0" style="background:#c86d51;" title="音階 Do (鍵盤 1)">
+                        <i class="fa-solid fa-music"></i>
+                        <span>Do</span>
+                    </button>
+                    <button class="xylo-key" data-note="1" style="background:#d98a54;" title="音階 Re (鍵盤 2)">
+                        <i class="fa-solid fa-music"></i>
+                        <span>Re</span>
+                    </button>
+                    <button class="xylo-key" data-note="2" style="background:#dfb15b;" title="音階 Mi (鍵盤 3)">
+                        <i class="fa-solid fa-music"></i>
+                        <span>Mi</span>
+                    </button>
+                    <button class="xylo-key" data-note="3" style="background:#9ab07a;" title="音階 Fa (鍵盤 4)">
+                        <i class="fa-solid fa-music"></i>
+                        <span>Fa</span>
+                    </button>
+                    <button class="xylo-key" data-note="4" style="background:#739e82;" title="音階 Sol (鍵盤 5)">
+                        <i class="fa-solid fa-music"></i>
+                        <span>Sol</span>
+                    </button>
+                    <button class="xylo-key" data-note="5" style="background:#668f99;" title="音階 La (鍵盤 6)">
+                        <i class="fa-solid fa-music"></i>
+                        <span>La</span>
+                    </button>
+                    <button class="xylo-key" data-note="6" style="background:#8a7996;" title="音階 Si (鍵盤 7)">
+                        <i class="fa-solid fa-music"></i>
+                        <span>Si</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 5. 正念呼吸木燈與木質情緒安全鏡 -->
+            <div class="tab-section" id="tab-breath">
+                <div class="info-card">
+                    <i class="fa-solid fa-video"></i>
+                    <strong>呼吸木燈 & 視訊安全鏡</strong>：開啟安全鏡鏡頭後，視角會正面對準牆上無遮擋的 <strong>3D 木框安全鏡</strong>，並與下方圓鏡同步顯示你的臉龐！看著鏡中的自己深呼吸，練習放鬆眉頭。
+                </div>
+                <div class="breath-mirror-row">
+                    <div class="breath-circle" id="breath-ui-circle">
+                        <span class="breath-phase-text" id="breath-phase">準備開始</span>
+                        <span class="breath-timer-num" id="breath-timer">--</span>
+                    </div>
+                    <div class="mirror-camera-box" id="mirror-camera-box" title="點擊切換安全鏡即時視訊">
+                        <video id="mirror-video" autoplay playsinline muted></video>
+                        <div class="mirror-placeholder" id="mirror-placeholder">
+                            <i class="fa-solid fa-camera"></i>
+                            <span>點擊開啟鏡頭<br>照照安全鏡</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="quote-box" id="mirror-prompt">
+                    <i class="fa-solid fa-face-smile"></i>
+                    <strong>安全鏡表情覺察：</strong>看看鏡子裡的自己，試著把皺起來的眉頭輕輕鬆開，給自己一個溫柔的微笑。
+                </div>
+                <div class="action-grid">
+                    <button class="action-btn primary-action" id="btn-toggle-camera">
+                        <i class="fa-solid fa-video" id="camera-btn-icon"></i>
+                        <span id="camera-btn-text">開啟安全鏡視訊 (正面看自己的臉)</span>
+                    </button>
+                    <button class="action-btn" id="btn-toggle-breath">
+                        <i class="fa-solid fa-play" id="breath-btn-icon"></i>
+                        <span id="breath-btn-text">開始呼吸引導</span>
+                    </button>
+                    <button class="action-btn" id="btn-mirror-check">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>換一個表情練習</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 6. 開放式層架：情緒天氣瓶（星砂變色）與原木樹洞信箱 -->
+            <div class="tab-section" id="tab-mood">
+                <div class="info-card">
+                    <i class="fa-solid fa-jar"></i>
+                    <strong>3D 情緒星砂天氣瓶 & 原木樹洞</strong>：點選下方心情，開放式木架上的<strong>透明情緒天氣瓶</strong>與<strong>流沙漏</strong>內的星砂會立即變換成對應的鮮明色彩！把心事寫下投入樹洞，樹洞會先清晰覆誦並收下你的話，再化為星塵消散。
+                </div>
+                <div class="mood-grid">
+                    <button class="mood-btn" data-mood="happy" data-color="#fbbf24" data-name="暖陽金黃">
+                        <i class="fa-solid fa-face-smile-beam" style="color:#fbbf24;"></i>
+                        <span>溫暖平靜</span>
+                    </button>
+                    <button class="mood-btn" data-mood="sad" data-color="#38bdf8" data-name="晴空湛藍">
+                        <i class="fa-solid fa-face-sad-tear" style="color:#38bdf8;"></i>
+                        <span>難過低落</span>
+                    </button>
+                    <button class="mood-btn" data-mood="angry" data-color="#f43f5e" data-name="珊瑚熾紅">
+                        <i class="fa-solid fa-face-tired" style="color:#f43f5e;"></i>
+                        <span>生氣激動</span>
+                    </button>
+                    <button class="mood-btn" data-mood="anxious" data-color="#a855f7" data-name="薰衣草紫">
+                        <i class="fa-solid fa-face-flushed" style="color:#c084fc;"></i>
+                        <span>緊張不安</span>
+                    </button>
+                    <button class="mood-btn" data-mood="tired" data-color="#10b981" data-name="森林翠綠">
+                        <i class="fa-solid fa-battery-quarter" style="color:#34d399;"></i>
+                        <span>疲憊想休息</span>
+                    </button>
+                    <button class="mood-btn" data-mood="loved" data-color="#ec4899" data-name="櫻花粉紅">
+                        <i class="fa-solid fa-face-grin-hearts" style="color:#f472b6;"></i>
+                        <span>安心感謝</span>
+                    </button>
+                </div>
+                <div class="quote-box" id="mood-feedback">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    目前星砂顏色：<strong id="current-sand-label" style="color:#fbbf24;">暖陽金黃</strong>（點選上方按鈕可立即變色！）
+                </div>
+
+                <!-- 樹洞回音顯示框 -->
+                <div class="treehole-echo-box" id="treehole-echo-box">
+                    <div style="display:flex; align-items:center; justify-content:space-between; font-size:0.8rem; color:var(--sage-light);">
+                        <span><i class="fa-solid fa-ear-listen"></i> 樹洞已聽見並收下你的話：</span>
+                        <span id="echo-countdown-tag">正在化為微光...</span>
+                    </div>
+                    <div class="echo-user-words" id="echo-user-words"></div>
+                    <div style="font-size:0.8rem; color:var(--text-main);" id="echo-comfort-reply">
+                        <i class="fa-solid fa-heart"></i> 謝謝你願意說出來，樹洞已經幫你把這份重量輕輕接住囉！
+                    </div>
+                </div>
+
+                <textarea class="worry-input" id="worry-textarea" placeholder="把想說的話寫在這裡，交給原木樹洞，樹洞聽見後會幫你化作森林微光喔..."></textarea>
+                <div class="action-grid">
+                    <button class="action-btn primary-action" id="btn-release-worry">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>投入原木樹洞 (顯示心聲並化為微光)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 底部導覽列與頁尾版權宣告 -->
+    <div class="bottom-bar-wrapper">
+        <!-- 3D 角落快速切換列 -->
+        <nav class="station-dock" aria-label="安全角區域切換">
+            <button class="dock-btn active" data-station="overview">
+                <i class="fa-solid fa-house-chimney-window"></i>
+                <span>木屋全景</span>
+            </button>
+            <button class="dock-btn" data-station="bear">
+                <i class="fa-solid fa-couch"></i>
+                <span>熊熊與抱枕</span>
+            </button>
+            <button class="dock-btn" data-station="squishy">
+                <i class="fa-solid fa-shapes"></i>
+                <span>幾何捏捏</span>
+            </button>
+            <button class="dock-btn" data-station="sensory">
+                <i class="fa-solid fa-hourglass-half"></i>
+                <span>七音木琴與沙漏</span>
+            </button>
+            <button class="dock-btn" data-station="breath">
+                <i class="fa-solid fa-video"></i>
+                <span>呼吸與安全鏡</span>
+            </button>
+            <button class="dock-btn" data-station="mood">
+                <i class="fa-solid fa-jar"></i>
+                <span>情緒天氣瓶</span>
+            </button>
+        </nav>
+
+        <!-- 頁尾：FB 粉絲專頁與 Copyright -->
+        <footer class="site-footer">
+            <a href="https://www.facebook.com/happyliyuchilltiger/" target="_blank" rel="noopener noreferrer" class="fb-link">
+                <i class="fa-brands fa-facebook"></i>
+                <span>快樂鯉魚秋老虎</span>
+            </a>
+            <div class="copyright-text">
+                Copyright &copy; Liyuchiutiger Gongminshen
+            </div>
+        </footer>
+    </div>
+
+    <!-- 左下角可自由移動吉祥物 (懸停霓虹彩色發光抖動) -->
+    <div id="mascot-widget" title="拖曳我可以移動到任何地方喔！">
+        <div class="mascot-bubble">
+            <i class="fa-solid fa-seedling"></i>
+            <span id="mascot-bubble-text">點我或拖曳我到任何地方！</span>
+        </div>
+        <img src="image/LiyuChillGuy.svg" alt="LiyuChillGuy 吉祥物" draggable="false">
+    </div>
+
+    <!-- Three.js 與 OrbitControls (透過 CDN 引入) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- 主互動邏輯腳本 -->
+    <script src="script.js?v=20261108_6"></script>
+</body>
+</html>
